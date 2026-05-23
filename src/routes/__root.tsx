@@ -9,6 +9,8 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import { AmbientBackground } from "@/components/AmbientBackground";
+import { AppNav } from "@/components/AppNav";
 
 function NotFoundComponent() {
   return (
@@ -72,19 +74,20 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "Quantum — Jornada de Transformação em 21 dias" },
+      { name: "description", content: "Uma jornada cinematográfica de 21 dias para observar, definir e tornar-se a nova versão de você. Mural, reflexões e Aurora, sua guia pessoal." },
+      { property: "og:title", content: "Quantum — Jornada de 21 dias" },
+      { property: "og:description", content: "Observe. Defina. Torne-se." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
+      { rel: "stylesheet", href: appCss },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "" },
       {
         rel: "stylesheet",
-        href: appCss,
+        href: "https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700&display=swap",
       },
     ],
   }),
@@ -96,7 +99,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <head>
         <HeadContent />
       </head>
@@ -113,7 +116,11 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <AmbientBackground />
+      <AppNav />
+      <main className="min-h-screen pt-20 md:pt-28 pb-32 md:pb-12 px-4 md:px-8">
+        <Outlet />
+      </main>
     </QueryClientProvider>
   );
 }
