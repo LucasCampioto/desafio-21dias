@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as JornadaRouteImport } from './routes/jornada'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as JornadaDiaDayRouteImport } from './routes/jornada.dia.$day'
 
 const JornadaRoute = JornadaRouteImport.update({
   id: '/jornada',
@@ -22,31 +23,39 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const JornadaDiaDayRoute = JornadaDiaDayRouteImport.update({
+  id: '/dia/$day',
+  path: '/dia/$day',
+  getParentRoute: () => JornadaRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/jornada': typeof JornadaRoute
+  '/jornada': typeof JornadaRouteWithChildren
+  '/jornada/dia/$day': typeof JornadaDiaDayRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/jornada': typeof JornadaRoute
+  '/jornada': typeof JornadaRouteWithChildren
+  '/jornada/dia/$day': typeof JornadaDiaDayRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/jornada': typeof JornadaRoute
+  '/jornada': typeof JornadaRouteWithChildren
+  '/jornada/dia/$day': typeof JornadaDiaDayRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/jornada'
+  fullPaths: '/' | '/jornada' | '/jornada/dia/$day'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/jornada'
-  id: '__root__' | '/' | '/jornada'
+  to: '/' | '/jornada' | '/jornada/dia/$day'
+  id: '__root__' | '/' | '/jornada' | '/jornada/dia/$day'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  JornadaRoute: typeof JornadaRoute
+  JornadaRoute: typeof JornadaRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -65,12 +74,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/jornada/dia/$day': {
+      id: '/jornada/dia/$day'
+      path: '/dia/$day'
+      fullPath: '/jornada/dia/$day'
+      preLoaderRoute: typeof JornadaDiaDayRouteImport
+      parentRoute: typeof JornadaRoute
+    }
   }
 }
 
+interface JornadaRouteChildren {
+  JornadaDiaDayRoute: typeof JornadaDiaDayRoute
+}
+
+const JornadaRouteChildren: JornadaRouteChildren = {
+  JornadaDiaDayRoute: JornadaDiaDayRoute,
+}
+
+const JornadaRouteWithChildren =
+  JornadaRoute._addFileChildren(JornadaRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  JornadaRoute: JornadaRoute,
+  JornadaRoute: JornadaRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
