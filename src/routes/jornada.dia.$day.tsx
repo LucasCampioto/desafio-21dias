@@ -38,7 +38,7 @@ export const Route = createFileRoute("/jornada/dia/$day")({
 
 function DayPage() {
   const { data } = Route.useLoaderData();
-  const meta = weekMeta[data.week];
+  const meta = weekMeta[data.week as 1 | 2 | 3];
   const storageKey = `quantum.day.${data.day}`;
   const [reflection, setReflection] = useState("");
   const [done, setDone] = useState(false);
