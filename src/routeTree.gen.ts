@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as JornadaRouteImport } from './routes/jornada'
 import { Route as EvolucaoRouteImport } from './routes/evolucao'
+import { Route as AuroraRouteImport } from './routes/aurora'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as JornadaDiaDayRouteImport } from './routes/jornada.dia.$day'
 
@@ -22,6 +23,11 @@ const JornadaRoute = JornadaRouteImport.update({
 const EvolucaoRoute = EvolucaoRouteImport.update({
   id: '/evolucao',
   path: '/evolucao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuroraRoute = AuroraRouteImport.update({
+  id: '/aurora',
+  path: '/aurora',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -37,12 +43,14 @@ const JornadaDiaDayRoute = JornadaDiaDayRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/aurora': typeof AuroraRoute
   '/evolucao': typeof EvolucaoRoute
   '/jornada': typeof JornadaRouteWithChildren
   '/jornada/dia/$day': typeof JornadaDiaDayRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/aurora': typeof AuroraRoute
   '/evolucao': typeof EvolucaoRoute
   '/jornada': typeof JornadaRouteWithChildren
   '/jornada/dia/$day': typeof JornadaDiaDayRoute
@@ -50,20 +58,28 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/aurora': typeof AuroraRoute
   '/evolucao': typeof EvolucaoRoute
   '/jornada': typeof JornadaRouteWithChildren
   '/jornada/dia/$day': typeof JornadaDiaDayRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/evolucao' | '/jornada' | '/jornada/dia/$day'
+  fullPaths: '/' | '/aurora' | '/evolucao' | '/jornada' | '/jornada/dia/$day'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/evolucao' | '/jornada' | '/jornada/dia/$day'
-  id: '__root__' | '/' | '/evolucao' | '/jornada' | '/jornada/dia/$day'
+  to: '/' | '/aurora' | '/evolucao' | '/jornada' | '/jornada/dia/$day'
+  id:
+    | '__root__'
+    | '/'
+    | '/aurora'
+    | '/evolucao'
+    | '/jornada'
+    | '/jornada/dia/$day'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuroraRoute: typeof AuroraRoute
   EvolucaoRoute: typeof EvolucaoRoute
   JornadaRoute: typeof JornadaRouteWithChildren
 }
@@ -82,6 +98,13 @@ declare module '@tanstack/react-router' {
       path: '/evolucao'
       fullPath: '/evolucao'
       preLoaderRoute: typeof EvolucaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/aurora': {
+      id: '/aurora'
+      path: '/aurora'
+      fullPath: '/aurora'
+      preLoaderRoute: typeof AuroraRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -114,6 +137,7 @@ const JornadaRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuroraRoute: AuroraRoute,
   EvolucaoRoute: EvolucaoRoute,
   JornadaRoute: JornadaRouteWithChildren,
 }
