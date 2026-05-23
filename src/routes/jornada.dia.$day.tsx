@@ -98,7 +98,7 @@ function DayPage() {
       <section className="mt-10">
         <h2 className="font-display text-2xl mb-4">Perguntas para reflexão</h2>
         <ul className="space-y-3">
-          {data.questions.map((q, i) => (
+          {data.questions.map((q: string, i: number) => (
             <motion.li
               key={i}
               initial={{ opacity: 0, x: -8 }}
