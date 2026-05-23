@@ -97,7 +97,7 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="pt-BR">
       <head>
         <HeadContent />
       </head>
@@ -114,7 +114,11 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <AmbientBackground />
+      <AppNav />
+      <main className="min-h-screen pt-20 md:pt-28 pb-32 md:pb-12 px-4 md:px-8">
+        <Outlet />
+      </main>
     </QueryClientProvider>
   );
 }
