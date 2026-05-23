@@ -9,6 +9,8 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import { AmbientBackground } from "@/components/AmbientBackground";
+import { AppNav } from "@/components/AppNav";
 
 function NotFoundComponent() {
   return (
