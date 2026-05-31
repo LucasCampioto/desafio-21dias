@@ -1,0 +1,42 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-beige: #e6e3d6;
+  --color-beige-light: #eae8de;
+  --color-sage: #9ea08f;
+  --color-lime: #d4f268;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: 'Instrument Sans', sans-serif;
+  background-color: var(--color-beige);
+  color: #262624;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background-color: #292524;
+  color: var(--color-beige);
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Mantém cor do input escuro no foco e autofill (login/cadastro) */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus {
+  transition: background-color 9999s ease-out 0s;
+}

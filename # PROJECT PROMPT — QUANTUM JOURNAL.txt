@@ -1,0 +1,597 @@
+# PROJECT PROMPT — QUANTUM JOURNAL / PERSONAL TRANSFORMATION APP
+
+Create a modern, immersive, emotional and highly polished web application in PORTUGUESE (Brazilian Portuguese only) focused on guided personal transformation through 21-day journeys.
+
+The app should feel:
+- modern
+- spiritual/introspective
+- elegant
+- cinematic
+- emotional
+- premium
+- calming
+- futuristic but human
+
+The visual identity should mix:
+- soft glassmorphism
+- subtle gradients
+- dark immersive backgrounds
+- animated transitions
+- floating cards
+- smooth step-by-step experiences
+- ambient particles/light effects
+- rounded UI
+- emotional onboarding
+
+IMPORTANT:
+The application must be FULLY RESPONSIVE:
+- mobile
+- tablet
+- notebook
+- ultrawide desktop
+
+The experience on mobile is PRIORITY.
+
+---------------------------------------------------
+CORE CONCEPT
+---------------------------------------------------
+
+This application is based on a 21-day guided transformation process divided into 3 weeks.
+
+Each week has a psychological focus:
+
+WEEK 1 → OBSERVATION
+Focus:
+- observing thoughts
+- emotional awareness
+- identifying patterns
+- negative self-talk
+- comparison
+- automatic behaviors
+
+WEEK 2 → CLEAR PURPOSE
+Focus:
+- vision
+- future identity
+- gratitude
+- purpose
+- emotional alignment
+- visualization
+- defining a new direction
+
+WEEK 3 → NEW IDENTITY
+Focus:
+- identity shift
+- action
+- decision making
+- financial consciousness
+- sustaining emotional alignment
+- becoming the new version of yourself
+
+---------------------------------------------------
+APPLICATION FLOW
+---------------------------------------------------
+
+The app should work like a guided emotional journey.
+
+The user starts a "Sessão de Transformação".
+
+Each session:
+- lasts 21 days
+- stores all writings/audio/transcriptions
+- can be repeated multiple times
+- previous sessions remain saved
+- users can compare emotional evolution over time
+
+The user can choose to start:
+- from week 1
+- from week 2
+- from week 3
+
+This means:
+- a session can start at day 1
+- or directly at day 8
+- or directly at day 15
+
+---------------------------------------------------
+IMPORTANT RULES
+---------------------------------------------------
+
+- Only ONE day can be opened at a time.
+- Future days must remain LOCKED.
+- The next day only unlocks the next calendar day.
+- Users can SEE that future days exist in the timeline, but CANNOT access the content.
+- The experience must feel like progressing through a sacred/introspective journey.
+
+Each day should feel:
+- immersive
+- emotional
+- calm
+- focused
+- guided
+
+---------------------------------------------------
+MAIN FEATURES
+---------------------------------------------------
+
+# 1 — AUTHENTICATION
+
+Create:
+- Login screen
+- Signup screen
+- Forgot password
+- Persistent authentication
+
+Modern emotional UI.
+
+---------------------------------------------------
+
+# 2 — HOME / MURAL SCREEN (FIRST SCREEN)
+
+This is the MAIN screen after login.
+
+Inspired by:
+- post-its
+- manifestation wall
+- emotional dashboard
+
+The user can:
+- create motivational cards
+- pin affirmations
+- create floating notes
+- organize visual thoughts
+
+Examples:
+- "Eu tenho sucesso"
+- "Eu sou abundante"
+- "Eu tenho empresas multimilionárias"
+
+Features:
+- drag and drop
+- resize cards
+- soft shadows
+- animations
+- editable colors
+- editable fonts
+- emotional backgrounds
+
+This screen should feel:
+- alive
+- inspiring
+- deeply personal
+
+Use smooth transitions and subtle floating animations.
+
+---------------------------------------------------
+
+# 3 — 21 DAY JOURNEY EXPERIENCE
+
+Create a BEAUTIFUL timeline/steps experience.
+
+The user sees:
+- current week
+- current day
+- locked future days
+- completed days
+- progress transitions
+
+Each day contains:
+- explanation
+- focus of the day
+- reflective questions
+- declarations
+- exercises
+- writing area
+- voice recording area
+- automatic speech-to-text transcription
+
+The UI should feel like:
+- guided meditation app
+- premium journaling app
+- cinematic storytelling
+
+---------------------------------------------------
+
+# 4 — AI PERSONAL ASSISTANT
+
+The app must contain a personal AI agent.
+
+IMPORTANT:
+The AI should feel HUMAN and PERSONAL.
+
+Give the assistant a human name.
+
+Suggested names:
+- Aurora
+- Sofia
+- Elena
+- Maya
+- Luna
+
+(choose the best one)
+
+This AI assistant:
+- has memory from ALL user sessions
+- understands user patterns
+- analyzes emotional patterns
+- analyzes financial behaviors
+- analyzes recurring thoughts
+- helps with alignment
+
+Example:
+If the user repeatedly writes:
+- impulsive spending
+- anxiety
+- lack of focus
+
+and later asks:
+"Essa compra faz sentido?"
+
+The AI should answer considering:
+- previous writings
+- goals
+- identity
+- emotional patterns
+- desired future
+
+The AI should feel:
+- wise
+- calm
+- emotionally intelligent
+- supportive
+- introspective
+
+NEVER robotic.
+
+The AI should communicate in Brazilian Portuguese.
+
+---------------------------------------------------
+
+# 5 — EVOLUTION ANALYSIS SCREEN
+
+DO NOT create a traditional dashboard with charts and metrics.
+
+Instead:
+Create an AI-powered evolution analysis experience.
+
+The AI should analyze:
+- emotional evolution
+- recurring patterns
+- growth
+- changes in language
+- emotional consistency
+- mindset evolution
+- behavior shifts
+
+The screen should feel like:
+- an intelligent reflection mirror
+- a personal evolution report
+
+The AI can generate:
+- insights
+- emotional summaries
+- pattern detection
+- improvements
+- warnings
+- growth recognition
+
+---------------------------------------------------
+
+# 6 — NOTIFICATIONS
+
+Implement:
+- daily reminders
+- incomplete day reminders
+- motivational notifications
+- reflection reminders
+
+Examples:
+- "Seu próximo passo está esperando por você."
+- "Hoje é um bom dia para observar seus pensamentos."
+- "Pequenas decisões moldam grandes identidades."
+
+---------------------------------------------------
+
+# 7 — AUDIO FEATURES
+
+Users must be able to:
+- record voice reflections
+- automatically transcribe audio into text
+- edit transcriptions
+- save both audio and text
+
+---------------------------------------------------
+
+# 8 — DESIGN SYSTEM
+
+Use:
+- smooth page transitions
+- animated timeline
+- glassmorphism
+- gradients
+- ambient backgrounds
+- floating lights
+- blur effects
+- premium typography
+- soft emotional colors
+
+The application should feel:
+- calm
+- introspective
+- premium
+- immersive
+
+---------------------------------------------------
+TECH STACK
+---------------------------------------------------
+
+Preferred stack:
+- Next.js
+- TypeScript
+- TailwindCSS
+- Framer Motion
+- Supabase
+- OpenAI API
+
+Architecture:
+- scalable
+- clean
+- modular
+
+---------------------------------------------------
+DATABASE STRUCTURE
+---------------------------------------------------
+
+Create models/tables for:
+- users
+- transformation_sessions
+- session_days
+- reflections
+- voice_records
+- ai_conversations
+- mural_cards
+- notifications
+- emotional_analysis
+
+---------------------------------------------------
+DAY-BY-DAY STRUCTURE
+---------------------------------------------------
+
+# WEEK 1 — OBSERVATION
+
+## Day 1 — O Observador
+Focus:
+- recurring thoughts
+- emotions
+- automatic language
+- negativity awareness
+
+Exercises:
+- identify recurring thoughts
+- identify emotional patterns
+- identify negative language
+
+Declaration:
+"Eu começo a perceber e direcionar o foco da minha mente."
+
+---------------------------------------------------
+
+## Day 2 — Mudando o Foco
+Focus:
+- mental focus
+- reactions
+- future thinking
+
+Exercises:
+- observe reactions when things go wrong
+- observe future expectations
+- observe self-description
+
+---------------------------------------------------
+
+## Day 3 — O Poder das Palavras
+Focus:
+- replacing negative language
+- conscious speech
+
+Exercise:
+- replace every negative sentence with a constructive one
+
+---------------------------------------------------
+
+## Day 4 — Padrões Invisíveis
+Focus:
+- hidden patterns
+- financial habits
+- behavioral repetition
+
+Exercises:
+- identify financial patterns
+- identify emotional habits
+- identify repetitive thoughts
+
+---------------------------------------------------
+
+## Day 5 — Comparação
+Focus:
+- comparison patterns
+- social influence
+
+Exercises:
+- identify comparison moments
+- redirect attention to personal journey
+
+---------------------------------------------------
+
+## Day 6 — Jejum do Indesejado
+Focus:
+- releasing unwanted realities
+- emotional detachment
+
+Exercises:
+- write “life I don’t want”
+- write “new life”
+- symbolic release ritual
+
+---------------------------------------------------
+
+## Day 7 — Liberação do Passado
+Focus:
+- faith
+- abundance
+- future reality
+
+Exercises:
+- define desired future reality
+- identify limiting beliefs
+
+---------------------------------------------------
+# WEEK 2 — CLEAR PURPOSE
+
+## Day 8 — Definindo o Alvo
+Focus:
+- vision
+- clarity
+- intentional direction
+
+---------------------------------------------------
+
+## Day 9 — Desejo Ardente
+Focus:
+- emotional motivation
+- purpose
+
+---------------------------------------------------
+
+## Day 10 — A Imagem da Realidade
+Focus:
+- future visualization
+- emotional immersion
+
+---------------------------------------------------
+
+## Day 11 — Gratidão Antecipada
+Focus:
+- gratitude
+- emotional anticipation
+
+---------------------------------------------------
+
+## Day 12 — Nova Identidade
+Focus:
+- identity affirmations
+- self-image
+
+---------------------------------------------------
+
+## Day 13 — Merecimento
+Focus:
+- self-worth
+- personal qualities
+
+---------------------------------------------------
+
+## Day 14 — Selamento do Propósito
+Focus:
+- defining life vision
+- long-term identity
+
+---------------------------------------------------
+# WEEK 3 — NEW IDENTITY
+
+## Day 15 — A Nova Identidade
+Focus:
+- identity shift
+- emotional coherence
+
+---------------------------------------------------
+
+## Day 16 — O Poder da Decisão
+Focus:
+- decisive action
+- commitment
+
+---------------------------------------------------
+
+## Day 17 — Ação Coerente
+Focus:
+- aligned execution
+- immediate action
+
+---------------------------------------------------
+
+## Day 18 — Dinheiro e Valor
+Focus:
+- money beliefs
+- financial consciousness
+
+---------------------------------------------------
+
+## Day 19 — Sustentação da Frequência
+Focus:
+- emotional maintenance
+- conscious state management
+
+---------------------------------------------------
+
+## Day 20 — Prova da Transformação
+Focus:
+- transformation recognition
+- emotional evolution
+
+---------------------------------------------------
+
+## Day 21 — O Colapso Consciente
+Focus:
+- identity integration
+- future reality declaration
+
+---------------------------------------------------
+EXTRA EXPERIENCE DETAILS
+---------------------------------------------------
+
+- The app should feel addictive in a GOOD WAY.
+- Deep emotional immersion.
+- Extremely smooth transitions.
+- Elegant microinteractions.
+- Beautiful mobile-first UX.
+- Timeline progression animations.
+- Soft sounds optional.
+- Emotional onboarding.
+- Personalized greetings.
+- Dynamic motivational phrases.
+- Premium feeling.
+
+---------------------------------------------------
+IMPORTANT FINAL INSTRUCTIONS
+---------------------------------------------------
+
+The ENTIRE application MUST be in Brazilian Portuguese.
+
+The UI should feel like a mix between:
+- journaling app
+- meditation app
+- personal transformation platform
+- cinematic emotional experience
+
+The app must NOT feel corporate.
+
+It must feel:
+- personal
+- emotional
+- reflective
+- futuristic
+- transformative
+
+Generate:
+- full frontend
+- responsive layouts
+- animations
+- database structure
+- authentication
+- AI integration structure
+- beautiful UI system
+- reusable components
+- modern architecture
+
+The experience should be GOOD ENOUGH to become a real startup product.
