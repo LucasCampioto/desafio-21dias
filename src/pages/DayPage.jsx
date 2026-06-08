@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { getDayById } from '../content'
@@ -21,6 +21,9 @@ export default function DayPage() {
   const [saved, setSaved] = useState(false)
   const [loadingAnswers, setLoadingAnswers] = useState(true)
   const [progressReady, setProgressReady] = useState(false)
+  const saveDebounceRef = useRef(null)
+  const savedIndicatorRef = useRef(null)
+  const pendingAnswersRef = useRef({})
 
   const session = getSessionById(sessionId)
   const id = Number(dayId)
@@ -72,16 +75,40 @@ export default function DayPage() {
     }
   }, [sessionId, dayId, id, getAnswers])
 
+  useEffect(() => {
+    pendingAnswersRef.current = answers
+  }, [answers])
+
+  useEffect(() => {
+    return () => {
+      if (saveDebounceRef.current) {
+        clearTimeout(saveDebounceRef.current)
+        if (sessionId) {
+          saveAnswers(id, pendingAnswersRef.current, sessionId)
+        }
+      }
+      if (savedIndicatorRef.current) clearTimeout(savedIndicatorRef.current)
+    }
+  }, [id, sessionId, saveAnswers])
+
   const handleChange = useCallback(
     (fieldId, value) => {
       if (readOnly) return
       setAnswers((prev) => {
         const next = { ...prev, [fieldId]: value }
-        saveAnswers(id, next, sessionId)
+        pendingAnswersRef.current = next
+
+        if (saveDebounceRef.current) clearTimeout(saveDebounceRef.current)
+        saveDebounceRef.current = setTimeout(() => {
+          saveAnswers(id, pendingAnswersRef.current, sessionId)
+        }, 600)
+
         return next
       })
+
       setSaved(true)
-      setTimeout(() => setSaved(false), 2000)
+      if (savedIndicatorRef.current) clearTimeout(savedIndicatorRef.current)
+      savedIndicatorRef.current = setTimeout(() => setSaved(false), 2000)
     },
     [id, sessionId, saveAnswers, readOnly],
   )
@@ -143,9 +170,14 @@ export default function DayPage() {
             Dia {day.id}: {day.title}
           </h1>
           <p className="mt-3 text-lg text-stone-400">{day.focus}</p>
-          {saved && (
-            <p className="mt-2 text-sm text-lime">Respostas salvas automaticamente</p>
-          )}
+          <p
+            className={`mt-2 h-5 text-sm text-lime transition-opacity duration-300 ${
+              saved ? 'opacity-100' : 'opacity-0'
+            }`}
+            aria-live="polite"
+          >
+            Respostas salvas automaticamente
+          </p>
           {loadingAnswers && (
             <p className="mt-2 text-sm text-stone-500">Carregando respostas...</p>
           )}

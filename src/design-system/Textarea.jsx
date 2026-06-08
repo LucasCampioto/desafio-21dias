@@ -12,10 +12,10 @@ export default function Textarea({
   const isGradient = variant === 'gradient'
 
   const textareaClassName = cn(
-    'min-h-[120px] w-full resize-y px-5 py-4 transition-all focus:outline-none',
+    'min-h-[120px] w-full resize-none overflow-y-auto px-5 py-4 focus:outline-none focus:ring-2',
     isGradient
-      ? 'rounded-2xl bg-[#201d1b] text-beige placeholder:text-stone-500 focus:ring-2 focus:ring-[#FBFCD4]/25'
-      : 'rounded-2xl border border-stone-300 bg-white/50 text-stone-900 placeholder:text-stone-500 backdrop-blur-sm focus:ring-2 focus:ring-stone-900/10',
+      ? 'rounded-2xl bg-[#201d1b] text-beige placeholder:text-stone-500 focus:ring-[#FBFCD4]/25'
+      : 'rounded-2xl border border-stone-300 bg-white/50 text-stone-900 placeholder:text-stone-500 backdrop-blur-sm focus:ring-stone-900/10',
     className,
   )
 
