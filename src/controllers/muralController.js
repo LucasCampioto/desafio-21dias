@@ -42,6 +42,10 @@ export function getMuralCards() {
   return cache
 }
 
+export function applyLocalCardUpdate(id, updates) {
+  cache = cache.map((card) => (card.id === id ? { ...card, ...updates } : card))
+}
+
 export async function loadMuralCards() {
   try {
     const data = await apiFetch('/mural/cards')
@@ -84,7 +88,8 @@ export async function updateCard(id, updates) {
     body: updates,
   })
 
-  const updated = mapCard(data?.card ?? { ...getMuralCards().find((card) => card.id === id), ...updates })
+  const existing = getMuralCards().find((card) => card.id === id)
+  const updated = mapCard(data?.card ?? data ?? { ...existing, ...updates })
   cache = cache.map((card) => (card.id === id ? { ...card, ...updated } : card))
   return cache
 }

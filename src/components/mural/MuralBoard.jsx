@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useCallback, useState } from 'react'
 import { DndContext, PointerSensor, useSensor, useSensors } from '@dnd-kit/core'
 import { motion } from 'framer-motion'
 import { useMural } from '../../contexts/MuralContext'
@@ -16,8 +16,54 @@ function normalizeColor(color) {
 export default function MuralBoard() {
   const { cards, addCard, updateCard, removeCard } = useMural()
   const [editingId, setEditingId] = useState(null)
+  const [draftById, setDraftById] = useState({})
   const [selectedCardId, setSelectedCardId] = useState(null)
   const [newCardColor, setNewCardColor] = useState(MURAL_COLORS[0])
+
+  const startEdit = useCallback(
+    (id) => {
+      const card = cards.find((c) => c.id === id)
+      if (!card) return
+      setEditingId(id)
+      setDraftById((prev) => {
+        if (prev[id] !== undefined) return prev
+        return { ...prev, [id]: card.text }
+      })
+    },
+    [cards],
+  )
+
+  const setDraft = useCallback((id, text) => {
+    setDraftById((prev) => ({ ...prev, [id]: text }))
+  }, [])
+
+  const commitEdit = useCallback(
+    async (id) => {
+      const draft = draftById[id]
+      const card = cards.find((c) => c.id === id)
+      if (draft !== undefined && card && draft !== card.text) {
+        await updateCard(id, { text: draft })
+      }
+      setEditingId((current) => (current === id ? null : current))
+      setDraftById((prev) => {
+        if (!(id in prev)) return prev
+        const next = { ...prev }
+        delete next[id]
+        return next
+      })
+    },
+    [cards, draftById, updateCard],
+  )
+
+  const cancelEdit = useCallback((id) => {
+    setEditingId((current) => (current === id ? null : current))
+    setDraftById((prev) => {
+      if (!(id in prev)) return prev
+      const next = { ...prev }
+      delete next[id]
+      return next
+    })
+  }, [])
 
   const selectedCard = cards.find((c) => c.id === selectedCardId) ?? null
   const activeColor = selectedCard?.color ?? newCardColor
@@ -121,26 +167,25 @@ export default function MuralBoard() {
           animate={{ opacity: 1 }}
           onPointerDown={handleCanvasPointerDown}
         >
-          {cards.map((card, i) => (
-            <motion.div
+          {cards.map((card) => (
+            <MuralCard
               key={card.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-            >
-              <MuralCard
-                card={card}
-                isSelected={selectedCardId === card.id}
-                onSelect={setSelectedCardId}
-                onUpdate={updateCard}
-                onDelete={(id) => {
-                  removeCard(id)
-                  if (selectedCardId === id) setSelectedCardId(null)
-                }}
-                isEditing={editingId === card.id}
-                setEditingId={setEditingId}
-              />
-            </motion.div>
+              card={card}
+              isSelected={selectedCardId === card.id}
+              onSelect={setSelectedCardId}
+              onUpdate={updateCard}
+              onDelete={(id) => {
+                removeCard(id)
+                if (selectedCardId === id) setSelectedCardId(null)
+                if (editingId === id) cancelEdit(id)
+              }}
+              isEditing={editingId === card.id}
+              draftText={draftById[card.id] ?? card.text}
+              onDraftChange={(text) => setDraft(card.id, text)}
+              onStartEdit={() => startEdit(card.id)}
+              onCommitEdit={() => commitEdit(card.id)}
+              onCancelEdit={() => cancelEdit(card.id)}
+            />
           ))}
           {cards.length === 0 && (
             <p className="absolute inset-0 flex items-center justify-center text-stone-500">
