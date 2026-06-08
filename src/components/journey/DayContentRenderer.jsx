@@ -1,6 +1,6 @@
-import Textarea from '../../design-system/Textarea'
 import Input from '../../design-system/Input'
 import Card from '../../design-system/Card'
+import DayAnswerField from './DayAnswerField'
 import Button from '../../design-system/Button'
 import { cn } from '../../lib/utils'
 
@@ -102,29 +102,19 @@ function SectionBlock({ section, answers, onChange, readOnly }) {
             </p>
           )}
           <div className="mt-4 space-y-4">
-            {section.fields?.map((field) =>
-              field.kind === 'textarea' ? (
-                <Textarea
-                  key={field.id}
-                  variant={fieldVariant}
-                  label={field.label}
-                  placeholder={field.placeholder}
-                  value={answers[field.id] || ''}
-                  onChange={(e) => onChange(field.id, e.target.value)}
-                  disabled={readOnly}
-                />
-              ) : (
-                <Input
-                  key={field.id}
-                  variant={fieldVariant}
-                  label={field.label}
-                  placeholder={field.placeholder}
-                  value={answers[field.id] || ''}
-                  onChange={(e) => onChange(field.id, e.target.value)}
-                  disabled={readOnly}
-                />
-              ),
-            )}
+            {section.fields?.map((field) => (
+              <DayAnswerField
+                key={field.id}
+                fieldId={field.id}
+                kind={field.kind}
+                variant={fieldVariant}
+                label={field.label}
+                placeholder={field.placeholder}
+                value={answers[field.id] || ''}
+                onChange={onChange}
+                readOnly={readOnly}
+              />
+            ))}
           </div>
         </Card>
       )
@@ -134,29 +124,19 @@ function SectionBlock({ section, answers, onChange, readOnly }) {
         <Card variant={variant}>
           <h3 className={getHeadingClass(variant)}>{section.title}</h3>
           <div className="mt-4 space-y-4">
-            {section.items?.map((item) =>
-              item.kind === 'textarea' ? (
-                <Textarea
-                  key={item.id}
-                  variant={fieldVariant}
-                  label={item.label}
-                  placeholder={item.placeholder}
-                  value={answers[item.id] || ''}
-                  onChange={(e) => onChange(item.id, e.target.value)}
-                  disabled={readOnly}
-                />
-              ) : (
-                <Input
-                  key={item.id}
-                  variant={fieldVariant}
-                  label={item.label}
-                  placeholder={item.placeholder}
-                  value={answers[item.id] || ''}
-                  onChange={(e) => onChange(item.id, e.target.value)}
-                  disabled={readOnly}
-                />
-              ),
-            )}
+            {section.items?.map((item) => (
+              <DayAnswerField
+                key={item.id}
+                fieldId={item.id}
+                kind={item.kind}
+                variant={fieldVariant}
+                label={item.label}
+                placeholder={item.placeholder}
+                value={answers[item.id] || ''}
+                onChange={onChange}
+                readOnly={readOnly}
+              />
+            ))}
           </div>
         </Card>
       )

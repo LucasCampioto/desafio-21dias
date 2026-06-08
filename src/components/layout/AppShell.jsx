@@ -53,7 +53,7 @@ export default function AppShell() {
           </button>
         </header>
 
-        <main className="flex-1 pb-20 lg:pb-0">
+        <main className="flex-1 overflow-anchor-none pb-20 lg:pb-0">
           <Outlet />
         </main>
 

@@ -1,6 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { motion } from 'framer-motion'
 import { getDayById } from '../content'
 import { useSession } from '../contexts/SessionContext'
 import { canAccessDay } from '../controllers/dayAccessController'
@@ -16,7 +15,7 @@ export default function DayPage() {
   const { sessionId, dayId } = useParams()
   const navigate = useNavigate()
   const day = getDayById(dayId)
-  const { getAnswers, saveAnswers, completeDay, getStatus, getSessionById, refresh } = useSession()
+  const { saveAnswers, completeDay, getStatus, getSessionById, refresh } = useSession()
   const [answers, setAnswers] = useState({})
   const [saved, setSaved] = useState(false)
   const [loadingAnswers, setLoadingAnswers] = useState(true)
@@ -24,6 +23,7 @@ export default function DayPage() {
   const saveDebounceRef = useRef(null)
   const savedIndicatorRef = useRef(null)
   const pendingAnswersRef = useRef({})
+  const hasUserEditedRef = useRef(false)
 
   const session = getSessionById(sessionId)
   const id = Number(dayId)
@@ -60,11 +60,16 @@ export default function DayPage() {
     if (!sessionId || !dayId) return
 
     let cancelled = false
+    hasUserEditedRef.current = false
     setLoadingAnswers(true)
 
-    getAnswers(id, sessionId)
+    sessionController
+      .getDayAnswers(sessionId, id)
       .then((loaded) => {
-        if (!cancelled) setAnswers(loaded)
+        if (!cancelled && !hasUserEditedRef.current) {
+          setAnswers(loaded)
+          pendingAnswersRef.current = loaded
+        }
       })
       .finally(() => {
         if (!cancelled) setLoadingAnswers(false)
@@ -73,7 +78,7 @@ export default function DayPage() {
     return () => {
       cancelled = true
     }
-  }, [sessionId, dayId, id, getAnswers])
+  }, [sessionId, dayId, id])
 
   useEffect(() => {
     pendingAnswersRef.current = answers
@@ -94,21 +99,25 @@ export default function DayPage() {
   const handleChange = useCallback(
     (fieldId, value) => {
       if (readOnly) return
+      hasUserEditedRef.current = true
+
       setAnswers((prev) => {
         const next = { ...prev, [fieldId]: value }
         pendingAnswersRef.current = next
-
-        if (saveDebounceRef.current) clearTimeout(saveDebounceRef.current)
-        saveDebounceRef.current = setTimeout(() => {
-          saveAnswers(id, pendingAnswersRef.current, sessionId)
-        }, 600)
-
         return next
       })
 
-      setSaved(true)
-      if (savedIndicatorRef.current) clearTimeout(savedIndicatorRef.current)
-      savedIndicatorRef.current = setTimeout(() => setSaved(false), 2000)
+      if (saveDebounceRef.current) clearTimeout(saveDebounceRef.current)
+      saveDebounceRef.current = setTimeout(async () => {
+        try {
+          await saveAnswers(id, pendingAnswersRef.current, sessionId)
+          setSaved(true)
+          if (savedIndicatorRef.current) clearTimeout(savedIndicatorRef.current)
+          savedIndicatorRef.current = setTimeout(() => setSaved(false), 2000)
+        } catch {
+          // Mantém o texto local; o usuário pode continuar editando.
+        }
+      }, 600)
     },
     [id, sessionId, saveAnswers, readOnly],
   )
@@ -150,8 +159,8 @@ export default function DayPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-950 via-stone-900 to-stone-800 px-4 py-8 md:px-12">
-      <div className="mx-auto max-w-3xl">
+    <div className="min-h-screen overflow-anchor-none bg-gradient-to-br from-stone-950 via-stone-900 to-stone-800 px-4 py-8 md:px-12">
+      <div className="mx-auto max-w-3xl [overflow-anchor:none]">
         <Link
           to={`/jornada/sessao/${sessionId}`}
           className="mb-6 inline-flex items-center gap-2 text-sm text-stone-400 hover:text-beige"
@@ -160,7 +169,7 @@ export default function DayPage() {
           {session.label}
         </Link>
 
-        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }}>
+        <div>
           <Badge variant="dark" className="mb-4">
             <span>
               Semana {day.week} — {day.weekTitle}
@@ -171,17 +180,15 @@ export default function DayPage() {
           </h1>
           <p className="mt-3 text-lg text-stone-400">{day.focus}</p>
           <p
-            className={`mt-2 h-5 text-sm text-lime transition-opacity duration-300 ${
-              saved ? 'opacity-100' : 'opacity-0'
-            }`}
+            className={`mt-2 h-5 text-sm text-lime ${saved ? 'opacity-100' : 'opacity-0'}`}
             aria-live="polite"
           >
             Respostas salvas automaticamente
           </p>
-          {loadingAnswers && (
-            <p className="mt-2 text-sm text-stone-500">Carregando respostas...</p>
-          )}
-        </motion.div>
+          <p className="mt-2 h-5 text-sm text-stone-500">
+            {loadingAnswers ? 'Carregando respostas...' : '\u00a0'}
+          </p>
+        </div>
 
         <div className="mt-8">
           <DayExplanationAccordion explanation={day.explanation} />
