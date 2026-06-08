@@ -31,6 +31,7 @@ export default function MuralCard({
   const height = card.height ?? DEFAULT_HEIGHT
 
   const [liveSize, setLiveSize] = useState({ width, height })
+  const [draftText, setDraftText] = useState(card.text)
   const resizingRef = useRef(false)
 
   useEffect(() => {
@@ -38,6 +39,19 @@ export default function MuralCard({
       setLiveSize({ width, height })
     }
   }, [width, height])
+
+  useEffect(() => {
+    if (isEditing) {
+      setDraftText(card.text)
+    }
+  }, [isEditing, card.id])
+
+  const commitTextEdit = useCallback(() => {
+    if (draftText !== card.text) {
+      onUpdate(card.id, { text: draftText })
+    }
+    setEditingId(null)
+  }, [card.id, card.text, draftText, onUpdate, setEditingId])
 
   const style = {
     transform: CSS.Translate.toString(transform),
@@ -98,10 +112,16 @@ export default function MuralCard({
         {isEditing ? (
           <textarea
             className="h-full w-full resize-none bg-transparent font-medium leading-snug text-stone-900 outline-none"
-            value={card.text}
+            value={draftText}
             autoFocus
-            onChange={(e) => onUpdate(card.id, { text: e.target.value })}
-            onBlur={() => setEditingId(null)}
+            onChange={(e) => setDraftText(e.target.value)}
+            onBlur={commitTextEdit}
+            onKeyDown={(e) => {
+              if (e.key === 'Escape') {
+                setDraftText(card.text)
+                setEditingId(null)
+              }
+            }}
             onPointerDown={(e) => e.stopPropagation()}
           />
         ) : (
