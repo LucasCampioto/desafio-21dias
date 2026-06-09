@@ -16,21 +16,22 @@ export default function AppShell() {
   }
 
   return (
-    <div className="flex min-h-screen bg-beige">
+    <div className="min-h-screen bg-beige">
       <BrowserNotificationScheduler />
-      <aside className="hidden w-64 flex-col border-r border-stone-300/30 bg-beige-light/80 p-6 backdrop-blur-md lg:flex">
-        <div className="mb-10">
+
+      <aside className="fixed inset-y-0 left-0 z-40 hidden h-screen w-64 flex-col border-r border-stone-300/30 bg-beige-light/95 p-6 backdrop-blur-md lg:flex">
+        <div className="mb-10 shrink-0">
           <p className="font-serif text-2xl font-light text-stone-900">{APP_NAME}</p>
           <p className="mt-1 text-sm text-stone-500">Olá, {user?.name}</p>
         </div>
-        <nav className="flex flex-1 flex-col gap-1">
+        <nav className="flex min-h-0 flex-1 flex-col gap-1 overflow-y-auto">
           {NAV_ITEMS.map((item) => (
             <NavLink
               key={item.to}
               to={item.to}
               className={({ isActive }) =>
                 cn(
-                  'flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors',
+                  'flex shrink-0 items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-colors',
                   isActive ? 'bg-stone-900 text-beige' : 'text-stone-600 hover:bg-stone-900/5',
                 )
               }
@@ -40,13 +41,15 @@ export default function AppShell() {
             </NavLink>
           ))}
         </nav>
-        <Button variant="secondary" size="sm" onClick={handleLogout}>
-          Sair
-        </Button>
+        <div className="mt-4 shrink-0">
+          <Button variant="secondary" size="sm" onClick={handleLogout}>
+            Sair
+          </Button>
+        </div>
       </aside>
 
-      <div className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center justify-between border-b border-stone-300/30 bg-beige/90 px-4 py-3 backdrop-blur-md lg:hidden">
+      <div className="flex min-h-screen min-w-0 flex-col lg:pl-64">
+        <header className="sticky top-0 z-30 flex items-center justify-between border-b border-stone-300/30 bg-beige/95 px-4 py-3 backdrop-blur-md lg:hidden">
           <p className="font-serif text-lg text-stone-900">{APP_NAME}</p>
           <button type="button" onClick={handleLogout} className="text-sm text-stone-600">
             Sair
