@@ -8,7 +8,12 @@ import EvolutionCampaignChart from '../components/evolution/EvolutionCampaignCha
 import PageHeader from '../design-system/PageHeader'
 import Badge from '../design-system/Badge'
 
-function formatEmotionalProgress(report) {
+function formatEmotionalProgress(report, withinCampaign) {
+  if (Array.isArray(withinCampaign) && withinCampaign.length > 0) {
+    const body = withinCampaign.map((item) => `• ${item.narrative}`).join('\n')
+    return { title: 'Progresso emocional por jornada', body }
+  }
+
   const section = report?.emotionalProgress
   if (!section) return null
 
@@ -47,7 +52,14 @@ function formatPatterns(report) {
   return { title, body }
 }
 
-function formatCrossCampaignInsights(report) {
+function formatCrossCampaignInsights(report, comparison) {
+  if (comparison?.narratives?.length) {
+    return {
+      title: 'Entre jornadas',
+      body: comparison.narratives.join('\n\n'),
+    }
+  }
+
   const insights = report?.crossCampaignInsights
   if (!Array.isArray(insights) || insights.length === 0) return null
 
@@ -66,6 +78,8 @@ export default function EvolutionPage() {
   const { session, sessions, hasSession } = useSession()
   const [insights, setInsights] = useState(null)
   const [chartCampaigns, setChartCampaigns] = useState([])
+  const [withinCampaign, setWithinCampaign] = useState([])
+  const [comparison, setComparison] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
@@ -78,6 +92,8 @@ export default function EvolutionPage() {
       if (!hasSession && sessions.length === 0) {
         setInsights(null)
         setChartCampaigns([])
+        setWithinCampaign([])
+        setComparison(null)
         setLoading(false)
         return
       }
@@ -86,13 +102,15 @@ export default function EvolutionPage() {
       setError(null)
 
       try {
-        const [report, campaigns] = await Promise.all([
-          evolutionController.fetchEvolutionInsights(),
+        const [report, chartData] = await Promise.all([
+          evolutionController.fetchEvolutionInsights().catch(() => null),
           evolutionController.fetchEvolutionCharts(),
         ])
         if (!cancelled) {
           setInsights(report)
-          setChartCampaigns(campaigns)
+          setChartCampaigns(chartData.campaigns)
+          setWithinCampaign(chartData.withinCampaign)
+          setComparison(chartData.comparison)
         }
       } catch (err) {
         if (!cancelled) {
@@ -110,9 +128,9 @@ export default function EvolutionPage() {
     }
   }, [hasSession, sessions.length])
 
-  const emotional = formatEmotionalProgress(insights)
+  const emotional = formatEmotionalProgress(insights, withinCampaign)
   const patterns = formatPatterns(insights)
-  const crossCampaign = formatCrossCampaignInsights(insights)
+  const crossCampaign = formatCrossCampaignInsights(insights, comparison)
   const auroraMessage = insights?.auroraMessage
 
   const fallbackEmotional = focusSession
@@ -148,7 +166,11 @@ export default function EvolutionPage() {
             animate={{ opacity: 1, y: 0 }}
             className="md:col-span-2"
           >
-            <EvolutionCampaignChart campaigns={chartCampaigns} />
+            <EvolutionCampaignChart
+              campaigns={chartCampaigns}
+              withinCampaign={withinCampaign}
+              comparison={comparison}
+            />
           </motion.div>
         )}
 

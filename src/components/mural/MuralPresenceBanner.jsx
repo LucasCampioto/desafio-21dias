@@ -33,8 +33,10 @@ export default function MuralPresenceBanner() {
                 </p>
               </div>
               <h3 className="mt-1 font-serif text-lg text-stone-900">{active.title}</h3>
-              <p className="mt-2 text-sm leading-relaxed text-stone-700">{active.body}</p>
-              {active.quote && (
+              <p className="mt-2 text-sm leading-relaxed text-stone-700">
+                {typeof active.body === 'string' ? active.body : ''}
+              </p>
+              {typeof active.quote === 'string' && active.quote && !active.quote.includes('[object Object]') && (
                 <blockquote className="mt-3 border-l-2 border-sage/60 pl-3 text-sm italic text-stone-600">
                   {active.quote}
                 </blockquote>

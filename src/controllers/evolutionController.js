@@ -7,5 +7,9 @@ export async function fetchEvolutionInsights() {
 
 export async function fetchEvolutionCharts() {
   const data = await apiFetch('/evolution/charts')
-  return data?.campaigns ?? []
+  return {
+    campaigns: data?.campaigns ?? [],
+    withinCampaign: data?.withinCampaign ?? [],
+    comparison: data?.comparison ?? null,
+  }
 }

@@ -4,135 +4,83 @@ import { AnimatePresence, motion } from 'framer-motion'
 import Card from '../../design-system/Card'
 import { cn } from '../../lib/utils'
 
+function normalizeBar(snapshot) {
+  if (!snapshot) return null
+  let neg = Math.round(snapshot.negativePct ?? 0)
+  let neu = Math.round(snapshot.neutralPct ?? 0)
+  let pos = Math.round(snapshot.positivePct ?? 0)
+  const sum = neg + neu + pos
+  if (sum <= 0) return { neg: 0, neu: 100, pos: 0 }
+  if (sum !== 100) {
+    const ordered = [
+      ['neg', neg],
+      ['neu', neu],
+      ['pos', pos],
+    ].sort((a, b) => b[1] - a[1])
+    const key = ordered[0][0]
+    const diff = 100 - sum
+    if (key === 'neg') neg += diff
+    else if (key === 'neu') neu += diff
+    else pos += diff
+  }
+  return { neg, neu, pos }
+}
+
 function SentimentBar({ label, snapshot }) {
-  if (!snapshot) {
+  const bar = normalizeBar(snapshot)
+  if (!bar) {
     return (
       <div className="flex-1">
         <p className="mb-2 text-xs font-medium uppercase tracking-wide text-stone-500">{label}</p>
-        <div className="flex h-8 items-center justify-center rounded-xl bg-stone-100 text-xs text-stone-400">
+        <div className="flex h-7 items-center justify-center rounded-xl bg-stone-100 text-xs text-stone-400">
           Sem dados
         </div>
       </div>
     )
   }
 
-  const { negativePct = 0, neutralPct = 0, positivePct = 0 } = snapshot
-  const total = negativePct + neutralPct + positivePct
-  const scale = total > 100 ? 100 / total : 1
-  const neg = Math.round(negativePct * scale)
-  const neu = Math.round(neutralPct * scale)
-  const pos = Math.round(positivePct * scale)
+  const { neg, neu, pos } = bar
 
   return (
     <div className="flex-1">
       <p className="mb-2 text-xs font-medium uppercase tracking-wide text-stone-500">{label}</p>
-      <div className="flex h-8 overflow-hidden rounded-xl border border-stone-200/80">
+      <div className="flex h-7 overflow-hidden rounded-xl border border-stone-200/80">
         {neg > 0 && (
-          <div
-            className="flex items-center justify-center bg-red-400/80 text-[10px] font-medium text-white"
-            style={{ width: `${neg}%` }}
-            title={`Negativo ${neg}%`}
-          >
-            {neg >= 12 ? `${neg}%` : ''}
-          </div>
+          <div className="bg-red-400/80" style={{ width: `${neg}%` }} title={`Mais pesado ${neg}%`} />
         )}
         {neu > 0 && (
-          <div
-            className="flex items-center justify-center bg-stone-300/90 text-[10px] font-medium text-stone-700"
-            style={{ width: `${neu}%` }}
-            title={`Neutro ${neu}%`}
-          >
-            {neu >= 12 ? `${neu}%` : ''}
-          </div>
+          <div className="bg-stone-300/90" style={{ width: `${neu}%` }} title={`Neutro ${neu}%`} />
         )}
         {pos > 0 && (
-          <div
-            className="flex items-center justify-center bg-lime-400/90 text-[10px] font-medium text-stone-900"
-            style={{ width: `${pos}%` }}
-            title={`Positivo ${pos}%`}
-          >
-            {pos >= 12 ? `${pos}%` : ''}
-          </div>
+          <div className="bg-lime-400/90" style={{ width: `${pos}%` }} title={`Mais leve ${pos}%`} />
         )}
       </div>
-      <div className="mt-1.5 flex flex-wrap gap-x-3 gap-y-0.5 text-[10px] text-stone-500">
-        <span>Neg. {neg}%</span>
-        <span>Neu. {neu}%</span>
-        <span>Pos. {pos}%</span>
-      </div>
     </div>
   )
 }
 
-function EvolutionDelta({ start, end }) {
-  if (!start || !end) return null
-
-  const posDelta = Math.round((end.positivePct ?? 0) - (start.positivePct ?? 0))
-  const negDelta = Math.round((end.negativePct ?? 0) - (start.negativePct ?? 0))
-
-  const posImproved = posDelta > 0
-  const negImproved = negDelta < 0
-
-  return (
-    <div className="flex flex-wrap gap-2 text-xs">
-      {posDelta !== 0 && (
-        <span
-          className={`rounded-full px-2.5 py-1 font-medium ${
-            posImproved ? 'bg-lime-100 text-lime-800' : 'bg-stone-100 text-stone-600'
-          }`}
-        >
-          Positivo {posDelta > 0 ? '+' : ''}
-          {posDelta}%
-        </span>
-      )}
-      {negDelta !== 0 && (
-        <span
-          className={`rounded-full px-2.5 py-1 font-medium ${
-            negImproved ? 'bg-emerald-50 text-emerald-800' : 'bg-red-50 text-red-700'
-          }`}
-        >
-          Negativo {negDelta > 0 ? '+' : ''}
-          {negDelta}%
-        </span>
-      )}
-      {posDelta === 0 && negDelta === 0 && (
-        <span className="rounded-full bg-stone-100 px-2.5 py-1 text-stone-600">Estável</span>
-      )}
-    </div>
-  )
+function changeBadgeClass(change) {
+  if (change === 'improved' || change === 'mixed_improved') return 'bg-lime-100 text-lime-800'
+  if (change === 'worsened' || change === 'mixed_worsened') return 'bg-red-50 text-red-700'
+  return 'bg-stone-100 text-stone-600'
 }
 
-function WeekTrend({ byWeek }) {
-  const weeks = ['1', '2', '3']
-    .map((key) => byWeek?.[key])
-    .filter(Boolean)
-
-  if (weeks.length < 2) return null
-
+function QuoteBlock({ excerpt, tone = 'neutral' }) {
+  if (!excerpt?.text) return null
   return (
-    <div className="mt-4 border-t border-stone-200/60 pt-4">
-      <p className="mb-3 text-xs font-medium uppercase tracking-wide text-stone-500">
-        Positivo ao longo das semanas
-      </p>
-      <div className="flex items-end gap-2 sm:gap-3">
-        {weeks.map((week, index) => {
-          const pct = Math.round(week.positivePct ?? 0)
-          return (
-            <div key={index} className="flex flex-1 flex-col items-center gap-1">
-              <span className="text-[10px] font-medium text-stone-600">{pct}%</span>
-              <div className="flex h-16 w-full items-end rounded-lg bg-stone-100/80 px-1 pb-1">
-                <div
-                  className="w-full rounded-md bg-lime-400/90 transition-all"
-                  style={{ height: `${Math.max(8, pct)}%` }}
-                  title={`Semana ${index + 1}: ${pct}% positivo`}
-                />
-              </div>
-              <span className="text-[10px] text-stone-400">S{index + 1}</span>
-            </div>
-          )
-        })}
-      </div>
-    </div>
+    <blockquote
+      className={cn(
+        'mt-3 rounded-2xl border-l-4 bg-white/70 px-4 py-3 text-sm leading-relaxed text-stone-700',
+        tone === 'positive' && 'border-lime-400',
+        tone === 'negative' && 'border-red-300',
+        tone === 'neutral' && 'border-stone-300',
+      )}
+    >
+      “{excerpt.text}”
+      {excerpt.dayId ? (
+        <span className="mt-1 block text-[11px] text-stone-400">Dia {excerpt.dayId}</span>
+      ) : null}
+    </blockquote>
   )
 }
 
@@ -140,41 +88,126 @@ function hasChartData(campaign) {
   return Boolean(campaign?.start && campaign?.end)
 }
 
-function CampaignRow({ campaign }) {
+function CampaignRow({ campaign, insight }) {
+  const startLabel = campaign.startWeek ? `Começo` : 'Começo'
+  const endLabel = campaign.endWeek ? `Agora` : 'Agora'
+  const sourceNote =
+    campaign.source === 'answers_heuristic'
+      ? 'Leitura a partir dos exercícios — a análise emocional automática ainda está incompleta nesta jornada.'
+      : null
+
   return (
-    <div className="rounded-2xl border border-stone-200/60 bg-white/50 p-4">
-      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
+    <div className="rounded-2xl border border-stone-200/60 bg-white/50 p-5">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <h4 className="font-serif text-lg text-stone-900">{campaign.label}</h4>
-        <div className="flex flex-wrap items-center gap-2">
-          <EvolutionDelta start={campaign.start} end={campaign.end} />
-          {campaign.overallTone && (
-            <span className="rounded-full bg-stone-100 px-2.5 py-0.5 text-xs capitalize text-stone-600">
-              {campaign.overallTone}
-            </span>
-          )}
+        {insight?.badge && (
+          <span
+            className={cn(
+              'rounded-full px-2.5 py-1 text-xs font-medium',
+              changeBadgeClass(insight.change),
+            )}
+          >
+            {insight.badge}
+          </span>
+        )}
+      </div>
+
+      {insight?.narrative && (
+        <p className="text-[15px] leading-relaxed text-stone-700">{insight.narrative}</p>
+      )}
+
+      <QuoteBlock excerpt={insight?.excerpts?.positive} tone="positive" />
+      <QuoteBlock excerpt={insight?.excerpts?.negative} tone="negative" />
+
+      <div className="mt-5 border-t border-stone-200/60 pt-4">
+        <p className="mb-3 text-xs font-medium uppercase tracking-wide text-stone-400">
+          Visual do percurso
+        </p>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+          <SentimentBar label={startLabel} snapshot={campaign.start} />
+          <div className="hidden text-stone-300 sm:block" aria-hidden>
+            →
+          </div>
+          <SentimentBar label={endLabel} snapshot={campaign.end} />
         </div>
       </div>
-      <div className="flex flex-col gap-4 sm:flex-row sm:gap-6">
-        <SentimentBar label="Início (semana 1)" snapshot={campaign.start} />
-        <div className="hidden items-center text-stone-300 sm:flex" aria-hidden>
-          →
-        </div>
-        <SentimentBar label="Final (semana 3)" snapshot={campaign.end} />
-      </div>
-      <WeekTrend byWeek={campaign.byWeek} />
+
+      {sourceNote && <p className="mt-3 text-[11px] text-stone-400">{sourceNote}</p>}
     </div>
   )
 }
 
-export default function EvolutionCampaignChart({ campaigns }) {
+function CrossCampaignPanel({ comparison }) {
+  if (!comparison) return null
+
+  const highlight = comparison.highlights?.[0]
+  const paragraphs = comparison.story?.paragraphs || comparison.narratives || []
+  const excerpts = comparison.story?.excerpts || {}
+
+  return (
+    <div className="mt-8 border-t border-stone-200/60 pt-6">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h3 className="font-serif text-xl text-stone-900">Entre campanhas</h3>
+          <p className="mt-1 text-sm text-stone-500">
+            Uma leitura do que mudou de uma jornada para a outra, com base no que você escreveu.
+          </p>
+        </div>
+        {comparison.story?.badge && (
+          <span
+            className={cn(
+              'rounded-full px-2.5 py-1 text-xs font-medium',
+              changeBadgeClass(comparison.story.change),
+            )}
+          >
+            {comparison.story.badge}
+          </span>
+        )}
+      </div>
+
+      <div className="space-y-3 text-[15px] leading-relaxed text-stone-700">
+        {paragraphs.map((line) => (
+          <p key={line}>{line}</p>
+        ))}
+      </div>
+
+      <QuoteBlock excerpt={excerpts.currentPositive} tone="positive" />
+      <QuoteBlock excerpt={excerpts.baselineNegative || excerpts.currentNegative} tone="negative" />
+
+      {comparison.available && highlight && (
+        <div className="mt-5 rounded-2xl border border-stone-200/60 bg-white/40 p-4">
+          <p className="mb-3 text-xs font-medium uppercase tracking-wide text-stone-400">
+            Visual da comparação
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+            <SentimentBar label={highlight.fromLabel || 'Antes'} snapshot={highlight.from} />
+            <div className="hidden text-stone-300 sm:block" aria-hidden>
+              →
+            </div>
+            <SentimentBar label={highlight.toLabel || 'Depois'} snapshot={highlight.to} />
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+export default function EvolutionCampaignChart({
+  campaigns,
+  withinCampaign = [],
+  comparison = null,
+}) {
   const withData = (campaigns ?? []).filter(hasChartData)
-  const [expanded, setExpanded] = useState(false)
+  const insightBySession = Object.fromEntries(
+    (withinCampaign || []).map((item) => [item.sessionId, item]),
+  )
+  const [expanded, setExpanded] = useState(true)
 
   if (!withData.length) return null
 
   const journeyCount = withData.length
   const summaryLabel =
-    journeyCount === 1 ? '1 jornada com dados' : `${journeyCount} jornadas com dados`
+    journeyCount === 1 ? '1 jornada com leitura' : `${journeyCount} jornadas com leitura`
 
   return (
     <Card variant="panel" className="md:col-span-2 !p-0 overflow-hidden">
@@ -185,11 +218,11 @@ export default function EvolutionCampaignChart({ campaigns }) {
         aria-expanded={expanded}
       >
         <div className="min-w-0 flex-1">
-          <h3 className="font-serif text-xl text-stone-900">Evolução emocional por jornada</h3>
+          <h3 className="font-serif text-xl text-stone-900">Evolução emocional</h3>
           <p className="mt-2 text-sm text-stone-500">
             {expanded
-              ? 'Compare como você começou e terminou cada campanha.'
-              : `${summaryLabel} — clique para ver início vs. final de cada campanha.`}
+              ? 'A história do que mudou — com trechos seus. Os gráficos só ilustram o texto.'
+              : `${summaryLabel} — clique para ler a história da sua evolução.`}
           </p>
         </div>
         <div
@@ -197,7 +230,7 @@ export default function EvolutionCampaignChart({ campaigns }) {
             'mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full border transition-all duration-300',
             expanded
               ? 'border-stone-400/60 bg-stone-100 text-stone-700'
-              : 'border-stone-300/60 text-stone-500'
+              : 'border-stone-300/60 text-stone-500',
           )}
         >
           <Icon
@@ -218,30 +251,20 @@ export default function EvolutionCampaignChart({ campaigns }) {
             className="overflow-hidden"
           >
             <div className="border-t border-stone-200/60 px-6 pb-6 md:px-8 md:pb-8">
-              <p className="pt-4 text-sm text-stone-500">
-                Vermelho = negativo, cinza = neutro, verde = positivo (média diária em %).
-              </p>
-
-              <div className="mt-4 flex flex-wrap gap-4 text-xs text-stone-500">
-                <span className="flex items-center gap-1.5">
-                  <span className="inline-block h-2.5 w-2.5 rounded-sm bg-red-400/80" />
-                  Negativo
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="inline-block h-2.5 w-2.5 rounded-sm bg-stone-300/90" />
-                  Neutro
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="inline-block h-2.5 w-2.5 rounded-sm bg-lime-400/90" />
-                  Positivo
-                </span>
-              </div>
-
               <div className="mt-6 space-y-4">
+                <h4 className="text-xs font-medium uppercase tracking-wide text-stone-500">
+                  Em cada jornada
+                </h4>
                 {withData.map((campaign) => (
-                  <CampaignRow key={campaign.sessionId} campaign={campaign} />
+                  <CampaignRow
+                    key={campaign.sessionId}
+                    campaign={campaign}
+                    insight={insightBySession[campaign.sessionId]}
+                  />
                 ))}
               </div>
+
+              <CrossCampaignPanel comparison={comparison} />
             </div>
           </motion.div>
         )}
