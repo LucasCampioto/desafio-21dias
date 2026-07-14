@@ -1,4 +1,4 @@
-# PROJECT PROMPT — QUANTUM JOURNAL / PERSONAL TRANSFORMATION APP
+# PROJECT PROMPT — QUANTUM JOURNAL / PERSONAL TRANSFORMATION APP-
 
 Create a modern, immersive, emotional and highly polished web application in PORTUGUESE (Brazilian Portuguese only) focused on guided personal transformation through 21-day journeys.
 
