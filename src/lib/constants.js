@@ -8,6 +8,7 @@ export const STORAGE_KEYS = {
   ASSISTANT_MESSAGES: 'qj_assistant_messages',
   MOCK_INITIALIZED: 'qj_mock_sessions_initialized',
   NOTIFICATION_PREFS: 'qj_notification_prefs',
+  SIDEBAR_COLLAPSED: 'qj_sidebar_collapsed',
 }
 
 /** Histórico do assistente expira após 24h (novo chat por período). */

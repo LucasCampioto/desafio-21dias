@@ -5,6 +5,7 @@ import { useMural } from '../../contexts/MuralContext'
 import { MURAL_COLORS, CARD_FONTS } from '../../data/weeks'
 import MuralCard from './MuralCard'
 import MuralPresenceBanner from './MuralPresenceBanner'
+import WeeklyGoalsPanel from './WeeklyGoalsPanel'
 import Button from '../../design-system/Button'
 import PageHeader from '../../design-system/PageHeader'
 import Badge from '../../design-system/Badge'
@@ -94,8 +95,9 @@ export default function MuralBoard() {
   }
 
   return (
-    <div className="px-4 py-8 md:px-8 lg:px-12">
+    <div className="flex min-h-full flex-col px-4 py-4 md:h-full md:min-h-0 md:overflow-hidden md:px-5 md:py-5">
       <PageHeader
+        compact
         badge={
           <Badge pulse>
             <span>Seu mural de manifestação</span>
@@ -107,7 +109,8 @@ export default function MuralBoard() {
 
       <MuralPresenceBanner />
 
-      <div className="mb-6 flex flex-wrap items-center gap-3">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <div className="mb-3 flex shrink-0 flex-wrap items-center gap-3">
         <Button
           variant="primary"
           size="sm"
@@ -158,42 +161,49 @@ export default function MuralBoard() {
             {f.label}
           </button>
         ))}
-      </div>
+        </div>
 
-      <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-        <motion.div
-          className="relative min-h-[520px] overflow-hidden rounded-3xl border border-stone-300/40 bg-gradient-to-br from-beige-light via-beige to-sage/20"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          onPointerDown={handleCanvasPointerDown}
-        >
-          {cards.map((card) => (
-            <MuralCard
-              key={card.id}
-              card={card}
-              isSelected={selectedCardId === card.id}
-              onSelect={setSelectedCardId}
-              onUpdate={updateCard}
-              onDelete={(id) => {
-                removeCard(id)
-                if (selectedCardId === id) setSelectedCardId(null)
-                if (editingId === id) cancelEdit(id)
-              }}
-              isEditing={editingId === card.id}
-              draftText={draftById[card.id] ?? card.text}
-              onDraftChange={(text) => setDraft(card.id, text)}
-              onStartEdit={() => startEdit(card.id)}
-              onCommitEdit={() => commitEdit(card.id)}
-              onCancelEdit={() => cancelEdit(card.id)}
-            />
-          ))}
-          {cards.length === 0 && (
-            <p className="absolute inset-0 flex items-center justify-center text-stone-500">
-              Crie seu primeiro card de afirmação
-            </p>
-          )}
-        </motion.div>
-      </DndContext>
+        <div className="flex min-h-0 flex-1 flex-col gap-4 md:flex-row">
+          <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+            <motion.div
+              className="relative min-h-[280px] min-w-0 flex-1 overflow-auto rounded-3xl border border-stone-300/40 bg-gradient-to-br from-beige-light via-beige to-sage/20"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              onPointerDown={handleCanvasPointerDown}
+            >
+              {cards.map((card) => (
+                <MuralCard
+                  key={card.id}
+                  card={card}
+                  isSelected={selectedCardId === card.id}
+                  onSelect={setSelectedCardId}
+                  onUpdate={updateCard}
+                  onDelete={(id) => {
+                    removeCard(id)
+                    if (selectedCardId === id) setSelectedCardId(null)
+                    if (editingId === id) cancelEdit(id)
+                  }}
+                  isEditing={editingId === card.id}
+                  draftText={draftById[card.id] ?? card.text}
+                  onDraftChange={(text) => setDraft(card.id, text)}
+                  onStartEdit={() => startEdit(card.id)}
+                  onCommitEdit={() => commitEdit(card.id)}
+                  onCancelEdit={() => cancelEdit(card.id)}
+                />
+              ))}
+              {cards.length === 0 && (
+                <p className="absolute inset-0 flex items-center justify-center text-stone-500">
+                  Crie seu primeiro card de afirmação
+                </p>
+              )}
+            </motion.div>
+          </DndContext>
+
+          <div className="flex w-full shrink-0 md:h-full md:w-60 md:min-h-0">
+            <WeeklyGoalsPanel />
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
