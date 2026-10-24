@@ -95,7 +95,7 @@ export default function MuralBoard() {
   }
 
   return (
-    <div className="flex min-h-full flex-col px-4 py-4 md:h-full md:min-h-0 md:overflow-hidden md:px-5 md:py-5">
+    <div className="flex min-h-full w-full flex-col px-4 py-4 md:h-dvh md:min-h-0 md:overflow-hidden md:px-5 md:py-5">
       <PageHeader
         compact
         badge={

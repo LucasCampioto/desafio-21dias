@@ -116,8 +116,10 @@ export default function AppShell() {
           </button>
         </header>
 
-        <main className="flex min-h-0 flex-1 flex-col overflow-auto pb-20 md:pb-0">
-          <Outlet />
+        <main className="min-h-0 w-full flex-1 overflow-auto pb-20 md:pb-0">
+          <div className="min-h-full w-full">
+            <Outlet />
+          </div>
         </main>
 
         <nav className="fixed bottom-0 left-0 right-0 z-50 flex border-t border-stone-300/30 bg-beige/95 backdrop-blur-md md:hidden">
