@@ -19,9 +19,9 @@ export default function MuralPresenceBanner() {
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -8 }}
-          className="mb-6 overflow-hidden rounded-2xl border border-sage/40 bg-gradient-to-r from-beige-light via-white to-sage/10 shadow-sm"
+          className="mb-2 overflow-hidden rounded-2xl border border-sage/40 bg-gradient-to-r from-beige-light via-white to-sage/10 shadow-sm"
         >
-          <div className="flex items-start gap-3 p-4 md:p-5">
+          <div className="flex items-start gap-3 p-3 md:p-4">
             <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-stone-900/5">
               <Icon icon="solar:heart-pulse-linear" width={20} className="text-stone-700" />
             </div>

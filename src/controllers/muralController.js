@@ -1,12 +1,31 @@
 import { apiFetch, normalizeId } from '../lib/apiClient'
 
-const DEFAULT_CARD_SIZE = { width: 192, height: 120 }
+const DEFAULT_CARD_SIZE = { width: 192, height: 140 }
 
 const DEFAULT_CARDS = [
-  { id: '1', text: 'Eu tenho sucesso', color: '#D4F268', x: 40, y: 60, fontSize: 16, ...DEFAULT_CARD_SIZE },
-  { id: '2', text: 'Eu sou abundante', color: '#EBC8D6', x: 220, y: 120, fontSize: 18, ...DEFAULT_CARD_SIZE },
+  {
+    id: '1',
+    title: 'Sucesso',
+    text: 'Eu tenho sucesso',
+    color: '#D4F268',
+    x: 40,
+    y: 60,
+    fontSize: 16,
+    ...DEFAULT_CARD_SIZE,
+  },
+  {
+    id: '2',
+    title: 'Abundância',
+    text: 'Eu sou abundante',
+    color: '#EBC8D6',
+    x: 220,
+    y: 120,
+    fontSize: 18,
+    ...DEFAULT_CARD_SIZE,
+  },
   {
     id: '3',
+    title: 'Empresas',
     text: 'Eu construo empresas multimilionárias',
     color: '#C4C9D9',
     x: 80,
@@ -22,6 +41,7 @@ function mapCard(card) {
   const normalized = normalizeId(card)
   return {
     id: normalized.id,
+    title: typeof normalized.title === 'string' ? normalized.title : '',
     text: normalized.text,
     color: normalized.color,
     x: normalized.x,
@@ -61,8 +81,9 @@ export async function loadMuralCards() {
   return cache
 }
 
-export async function createCard(text = 'Nova afirmação') {
+export async function createCard(text = 'Nova afirmação', title = '') {
   const cardPayload = {
+    title,
     text,
     color: '#FBFCD4',
     x: 100 + Math.random() * 200,

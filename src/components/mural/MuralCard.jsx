@@ -4,9 +4,9 @@ import { CSS } from '@dnd-kit/utilities'
 import { Icon } from '@iconify/react'
 
 const DEFAULT_WIDTH = 192
-const DEFAULT_HEIGHT = 120
+const DEFAULT_HEIGHT = 140
 const MIN_WIDTH = 120
-const MIN_HEIGHT = 80
+const MIN_HEIGHT = 100
 const MAX_WIDTH = 480
 const MAX_HEIGHT = 400
 
@@ -19,6 +19,7 @@ export default function MuralCard({
   onUpdate,
   onDelete,
   isEditing,
+  draftTitle,
   draftText,
   onDraftChange,
   onStartEdit,
@@ -27,6 +28,8 @@ export default function MuralCard({
   isSelected,
   onSelect,
 }) {
+  const cardRef = useRef(null)
+  const titleRef = useRef(null)
   const textareaRef = useRef(null)
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: card.id,
@@ -39,6 +42,14 @@ export default function MuralCard({
   const [liveSize, setLiveSize] = useState({ width, height })
   const resizingRef = useRef(false)
 
+  const setRefs = useCallback(
+    (node) => {
+      cardRef.current = node
+      setNodeRef(node)
+    },
+    [setNodeRef],
+  )
+
   useEffect(() => {
     if (!resizingRef.current) {
       setLiveSize({ width, height })
@@ -46,11 +57,11 @@ export default function MuralCard({
   }, [width, height])
 
   useLayoutEffect(() => {
-    if (!isEditing || !textareaRef.current) return
-    const textarea = textareaRef.current
-    textarea.focus()
-    const end = textarea.value.length
-    textarea.setSelectionRange(end, end)
+    if (!isEditing || !titleRef.current) return
+    const input = titleRef.current
+    input.focus()
+    const end = input.value.length
+    input.setSelectionRange(end, end)
   }, [isEditing])
 
   const style = {
@@ -106,9 +117,19 @@ export default function MuralCard({
     [card.id, onSelect, onStartEdit],
   )
 
+  const handleFieldBlur = useCallback(() => {
+    requestAnimationFrame(() => {
+      if (!cardRef.current?.contains(document.activeElement)) {
+        onCommitEdit()
+      }
+    })
+  }, [onCommitEdit])
+
+  const title = typeof card.title === 'string' ? card.title : ''
+
   return (
     <div
-      ref={setNodeRef}
+      ref={setRefs}
       style={style}
       className={`absolute flex flex-col rounded-xl p-4 shadow-lg transition-shadow ${
         isEditing
@@ -125,30 +146,55 @@ export default function MuralCard({
       {...(isEditing ? {} : listeners)}
       {...(isEditing ? {} : attributes)}
     >
-      <div className="min-h-0 flex-1 overflow-hidden">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
         {isEditing ? (
-          <textarea
-            ref={textareaRef}
-            className="h-full w-full resize-none bg-transparent font-medium leading-snug text-stone-900 outline-none"
-            value={draftText}
-            onChange={(e) => onDraftChange(e.target.value)}
-            onBlur={onCommitEdit}
-            onKeyDown={(e) => {
-              if (e.key === 'Escape') {
-                e.preventDefault()
-                onCancelEdit()
-              }
-            }}
-            onPointerDown={(e) => e.stopPropagation()}
-            onClick={(e) => e.stopPropagation()}
-          />
+          <>
+            <input
+              ref={titleRef}
+              className="mb-1 w-full shrink-0 bg-transparent font-serif text-[1.05em] font-bold leading-tight text-stone-900 outline-none placeholder:text-stone-900/35"
+              value={draftTitle}
+              placeholder="Título"
+              onChange={(e) => onDraftChange({ title: e.target.value })}
+              onBlur={handleFieldBlur}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  e.preventDefault()
+                  onCancelEdit()
+                }
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  textareaRef.current?.focus()
+                }
+              }}
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
+            />
+            <textarea
+              ref={textareaRef}
+              className="min-h-0 w-full flex-1 resize-none bg-transparent font-medium leading-snug text-stone-900 outline-none placeholder:text-stone-900/35"
+              value={draftText}
+              placeholder="Afirmação"
+              onChange={(e) => onDraftChange({ text: e.target.value })}
+              onBlur={handleFieldBlur}
+              onKeyDown={(e) => {
+                if (e.key === 'Escape') {
+                  e.preventDefault()
+                  onCancelEdit()
+                }
+              }}
+              onPointerDown={(e) => e.stopPropagation()}
+              onClick={(e) => e.stopPropagation()}
+            />
+          </>
         ) : (
-          <p
-            className="h-full overflow-auto font-medium leading-snug text-stone-900"
-            onDoubleClick={handleStartEdit}
-          >
-            {card.text}
-          </p>
+          <div className="h-full overflow-auto" onDoubleClick={handleStartEdit}>
+            {title ? (
+              <p className="mb-1 font-serif text-[1.05em] font-bold leading-tight text-stone-900">
+                {title}
+              </p>
+            ) : null}
+            <p className="font-medium leading-snug text-stone-900">{card.text}</p>
+          </div>
         )}
       </div>
 

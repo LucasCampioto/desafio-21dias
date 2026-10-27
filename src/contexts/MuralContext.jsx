@@ -35,14 +35,11 @@ export function MuralProvider({ children }) {
     refresh()
   }, [refresh])
 
-  const addCard = useCallback(
-    async (text) => {
-      const card = await muralController.createCard(text)
-      setCards(muralController.getMuralCards())
-      return card
-    },
-    [],
-  )
+  const addCard = useCallback(async (text, title = '') => {
+    const card = await muralController.createCard(text, title)
+    setCards(muralController.getMuralCards())
+    return card
+  }, [])
 
   const updateCard = useCallback(async (id, updates) => {
     setCards((prev) => prev.map((card) => (card.id === id ? { ...card, ...updates } : card)))

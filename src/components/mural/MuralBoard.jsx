@@ -7,7 +7,6 @@ import MuralCard from './MuralCard'
 import MuralPresenceBanner from './MuralPresenceBanner'
 import WeeklyGoalsPanel from './WeeklyGoalsPanel'
 import Button from '../../design-system/Button'
-import PageHeader from '../../design-system/PageHeader'
 import Badge from '../../design-system/Badge'
 
 function normalizeColor(color) {
@@ -28,22 +27,39 @@ export default function MuralBoard() {
       setEditingId(id)
       setDraftById((prev) => {
         if (prev[id] !== undefined) return prev
-        return { ...prev, [id]: card.text }
+        return {
+          ...prev,
+          [id]: {
+            title: typeof card.title === 'string' ? card.title : '',
+            text: card.text ?? '',
+          },
+        }
       })
     },
     [cards],
   )
 
-  const setDraft = useCallback((id, text) => {
-    setDraftById((prev) => ({ ...prev, [id]: text }))
+  const setDraft = useCallback((id, patch) => {
+    setDraftById((prev) => {
+      const current = prev[id] ?? { title: '', text: '' }
+      return { ...prev, [id]: { ...current, ...patch } }
+    })
   }, [])
 
   const commitEdit = useCallback(
     async (id) => {
       const draft = draftById[id]
       const card = cards.find((c) => c.id === id)
-      if (draft !== undefined && card && draft !== card.text) {
-        await updateCard(id, { text: draft })
+      if (draft !== undefined && card) {
+        const nextTitle = draft.title ?? ''
+        const nextText = draft.text ?? ''
+        const currentTitle = typeof card.title === 'string' ? card.title : ''
+        const updates = {}
+        if (nextTitle !== currentTitle) updates.title = nextTitle
+        if (nextText !== card.text) updates.text = nextText
+        if (Object.keys(updates).length > 0) {
+          await updateCard(id, updates)
+        }
       }
       setEditingId((current) => (current === id ? null : current))
       setDraftById((prev) => {
@@ -95,113 +111,112 @@ export default function MuralBoard() {
   }
 
   return (
-    <div className="flex min-h-full w-full flex-col px-4 py-4 md:h-dvh md:min-h-0 md:overflow-hidden md:px-5 md:py-5">
-      <PageHeader
-        compact
-        badge={
-          <Badge pulse>
+    <div className="flex min-h-full w-full flex-col px-3 py-3 md:h-dvh md:min-h-0 md:overflow-hidden md:px-4 md:py-3">
+      <div className="mb-2 flex shrink-0 flex-col gap-2 sm:flex-row sm:items-center sm:justify-between sm:gap-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <h1 className="font-serif text-3xl font-light tracking-tight text-stone-900 md:text-4xl">
+            Mural
+          </h1>
+          <Badge pulse className="hidden sm:inline-flex">
             <span>Seu mural de manifestação</span>
           </Badge>
-        }
-        title="Mural"
-        subtitle="Crie afirmações, organize pensamentos e mantenha sua visão viva."
-      />
+        </div>
+
+        <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+          <Button
+            variant="primary"
+            size="sm"
+            aria-label="Novo card"
+            title="Novo card"
+            className="!h-9 !w-9 !gap-0 !rounded-full !p-0 text-lg leading-none"
+            onClick={async () => {
+              const card = await addCard('Nova afirmação', '')
+              const color = selectedCard?.color ?? newCardColor
+              await updateCard(card.id, { color })
+              setSelectedCardId(card.id)
+            }}
+          >
+            +
+          </Button>
+
+          <div className="flex items-center gap-1.5">
+            {MURAL_COLORS.map((color) => (
+              <button
+                key={color}
+                type="button"
+                title={selectedCardId ? 'Alterar cor do card' : 'Cor para o próximo card'}
+                className={`h-7 w-7 rounded-full border-2 transition-transform hover:scale-105 ${
+                  normalizeColor(activeColor) === normalizeColor(color)
+                    ? 'border-stone-900 ring-2 ring-stone-900/20'
+                    : 'border-transparent'
+                }`}
+                style={{ backgroundColor: color }}
+                onClick={() => handleColorPick(color)}
+              />
+            ))}
+          </div>
+
+          {CARD_FONTS.map((f) => (
+            <button
+              key={f.value}
+              type="button"
+              className={`rounded-full border px-2.5 py-1 text-xs ${
+                selectedCard?.fontSize === f.value
+                  ? 'border-stone-900 bg-stone-900/5'
+                  : 'border-stone-300'
+              }`}
+              onClick={() => {
+                if (selectedCardId) updateCard(selectedCardId, { fontSize: f.value })
+              }}
+              disabled={!selectedCardId}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
       <MuralPresenceBanner />
 
-      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
-        <div className="mb-3 flex shrink-0 flex-wrap items-center gap-3">
-        <Button
-          variant="primary"
-          size="sm"
-          onClick={async () => {
-            const card = await addCard('Nova afirmação')
-            const color = selectedCard?.color ?? newCardColor
-            await updateCard(card.id, { color })
-            setSelectedCardId(card.id)
-          }}
-        >
-          + Novo card
-        </Button>
-
-        <div className="flex items-center gap-2">
-          {selectedCard && (
-            <span className="text-xs text-stone-500">Cor do card selecionado</span>
-          )}
-          {MURAL_COLORS.map((color) => (
-            <button
-              key={color}
-              type="button"
-              title={selectedCardId ? 'Alterar cor do card' : 'Cor para o próximo card'}
-              className={`h-8 w-8 rounded-full border-2 transition-transform hover:scale-105 ${
-                normalizeColor(activeColor) === normalizeColor(color)
-                  ? 'border-stone-900 ring-2 ring-stone-900/20'
-                  : 'border-transparent'
-              }`}
-              style={{ backgroundColor: color }}
-              onClick={() => handleColorPick(color)}
-            />
-          ))}
-        </div>
-
-        {CARD_FONTS.map((f) => (
-          <button
-            key={f.value}
-            type="button"
-            className={`rounded-full border px-3 py-1 text-xs ${
-              selectedCard?.fontSize === f.value
-                ? 'border-stone-900 bg-stone-900/5'
-                : 'border-stone-300'
-            }`}
-            onClick={() => {
-              if (selectedCardId) updateCard(selectedCardId, { fontSize: f.value })
-            }}
-            disabled={!selectedCardId}
+      <div className="flex min-h-0 flex-1 flex-col gap-3 overflow-hidden md:flex-row">
+        <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
+          <motion.div
+            className="relative min-h-[320px] min-w-0 flex-1 overflow-auto rounded-3xl border border-stone-300/40 bg-gradient-to-br from-beige-light via-beige to-sage/20"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            onPointerDown={handleCanvasPointerDown}
           >
-            {f.label}
-          </button>
-        ))}
-        </div>
+            {cards.map((card) => (
+              <MuralCard
+                key={card.id}
+                card={card}
+                isSelected={selectedCardId === card.id}
+                onSelect={setSelectedCardId}
+                onUpdate={updateCard}
+                onDelete={(id) => {
+                  removeCard(id)
+                  if (selectedCardId === id) setSelectedCardId(null)
+                  if (editingId === id) cancelEdit(id)
+                }}
+                isEditing={editingId === card.id}
+                draftTitle={draftById[card.id]?.title ?? card.title ?? ''}
+                draftText={draftById[card.id]?.text ?? card.text}
+                onDraftChange={(patch) => setDraft(card.id, patch)}
+                onStartEdit={() => startEdit(card.id)}
+                onCommitEdit={() => commitEdit(card.id)}
+                onCancelEdit={() => cancelEdit(card.id)}
+              />
+            ))}
+            {cards.length === 0 && (
+              <p className="absolute inset-0 flex items-center justify-center text-stone-500">
+                Crie seu primeiro card de afirmação
+              </p>
+            )}
+          </motion.div>
+        </DndContext>
 
-        <div className="flex min-h-0 flex-1 flex-col gap-4 md:flex-row">
-          <DndContext sensors={sensors} onDragEnd={handleDragEnd}>
-            <motion.div
-              className="relative min-h-[280px] min-w-0 flex-1 overflow-auto rounded-3xl border border-stone-300/40 bg-gradient-to-br from-beige-light via-beige to-sage/20"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              onPointerDown={handleCanvasPointerDown}
-            >
-              {cards.map((card) => (
-                <MuralCard
-                  key={card.id}
-                  card={card}
-                  isSelected={selectedCardId === card.id}
-                  onSelect={setSelectedCardId}
-                  onUpdate={updateCard}
-                  onDelete={(id) => {
-                    removeCard(id)
-                    if (selectedCardId === id) setSelectedCardId(null)
-                    if (editingId === id) cancelEdit(id)
-                  }}
-                  isEditing={editingId === card.id}
-                  draftText={draftById[card.id] ?? card.text}
-                  onDraftChange={(text) => setDraft(card.id, text)}
-                  onStartEdit={() => startEdit(card.id)}
-                  onCommitEdit={() => commitEdit(card.id)}
-                  onCancelEdit={() => cancelEdit(card.id)}
-                />
-              ))}
-              {cards.length === 0 && (
-                <p className="absolute inset-0 flex items-center justify-center text-stone-500">
-                  Crie seu primeiro card de afirmação
-                </p>
-              )}
-            </motion.div>
-          </DndContext>
-
-          <div className="flex w-full shrink-0 md:h-full md:w-60 md:min-h-0">
-            <WeeklyGoalsPanel />
-          </div>
+        <div className="flex min-h-[280px] w-full shrink-0 md:h-full md:w-52 md:min-h-0">
+          <WeeklyGoalsPanel />
         </div>
       </div>
     </div>
